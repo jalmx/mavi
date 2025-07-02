@@ -411,6 +411,18 @@
     [
       "23e44af8-6ca5-4638-a53a-78e41c420d21",
       "Root"
+    ],
+    [
+      "21315fcb-597a-463b-939c-e23081a7f25e",
+      "cargador"
+    ],
+    [
+      "62e368bf-b976-4daf-a266-29117ac0c900",
+      "voltage"
+    ],
+    [
+      "e83244ef-faf7-4e53-8547-d96e841c0208",
+      "micro"
     ]
   ],
   "text_variables": {}

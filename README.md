@@ -2,9 +2,21 @@
 
 Instrument to measure Voltage and Current
 
+## Communication
+
+![comm](firmware/communication.png)
+
+![web](firmware/UI.png)
+
+## Screens
+
 ![front](design/front.png)
 
 ![screen](design/screens.png)
+
+## Case
+
+![side](design/sides.png)
 
 ## Electronic Design
 

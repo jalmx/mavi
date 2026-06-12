@@ -1,112 +1,165 @@
-# MaVI
+# 🔬 MaVI — Advanced Voltage and Current Meter
 
-Instrument to measure Voltage and Current
+<div align="center">
 
-## Communication
+![Status](https://img.shields.io/badge/status-WIP-yellow?style=flat-square)
+![License: GPLv3](https://img.shields.io/badge/Software-GPLv3-blue?style=flat-square)
+![License: CERN-OHL-S-2.0](https://img.shields.io/badge/Hardware-CERN--OHL--S--2.0-blue?style=flat-square)
+![KiCad](https://img.shields.io/badge/KiCad-9.0-314CB0?style=flat-square)
+![ESP32](https://img.shields.io/badge/MCU-ESP32-red?style=flat-square)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple?style=flat-square)](https://www.alejandro-leyva.com/mavi/)
 
-![comm](firmware/communication.png)
-
-![web](firmware/UI.png)
-
-## Screens
-
-![front](interface/front.png)
-
-![screen](interface/screens.png)
-
-## Case
-
-![side](interface/sides.png)
-
-## Electronic Design
-
-## Voltage
-
-Este diseño es para todas las entradas de voltaje
-
-![schematic](electronic_design/schematic_v1.png)
-
-Como voltaje máximo se quiere que sean 50V.
-El amplificador que colocaremos tendrá ganancia de 10.
-
-De manera inicial se colocara una resistencia de 10k$\Omega$ la cual se medirá su voltaje el cual entrara a la entrada diferencial del amplificador operacional.
-Como quiero que al impedancia de entrada sea muy alta, agregando resistencias de 1M$\Omega$, con esto logrando 4M$\Omega$, este valor de base, agregando la resistencia de 10k$\Omega$ que hago mención al inicio, ahora se debe ver cual resistencia agregar en serie con esta resistencia para ajustar el voltaje que entrara al operacional.
-
-Haciendo el calculo de la corriente que pasara con base a las resistencias iniciales
-
-$$Rt = (1M\Omega * 4) + 10k \Omega = 4.01 M \Omega$$
-
-![schematic](electronic_design/resistencias_entrada.png)
-
-Ya con la resistencia total, podemos conocer la corriente que pasa en esa maya:
-
-$$I = \frac{V}{R} = \frac{50V}{4.01M\Omega} = 12.46 \mu A$$
-
-Con esto sabemos que la corriente maxima que vamos tener si estamos midiendo $50V$ de entrada será de $12.46 \mu A$
-
-Con esto vamos a conocer el voltaje que pasar en la resistencia de $10k \Omega$.
-
-$$V=RI = (10 k \Omega )(12.46 \mu A) = 124.6mV$$
-
-![amp](electronic_design/amplificador_10.png)
-
-Por lo tanto, en la resistencia R5 de $10k \Omega$ deben pasar $124.6mV$; pero necesitamos conocer si sera suficiente este voltaje de salida del amplificador, para el voltaje que llegara al ADC del ESP32.
-
-Dado que la ganancia que manejaremos en el amplificador sera de 10, obtenemos el siguiente voltaje a la salida del amplificador.
-
-$$Av = \frac{Rf}{Rs} = \frac{100k}{10K} = 10$$
-
-
-$$V_{out} = (124.6mV)(10) = 1.246V$$
-
-Pero, necesitamos $1.3V$ a la salida; por ende esto se ajusta fácilmente con un potenciómetro en seria a la resistencia de $10k \Omega$.
-Estos $1.3V$ se necesitan por la salida que deseamos:
-
-![signal](electronic_design/signal.png).
+> **Open-source instrument for precise voltage and current measurement.**  
+> ⚠️ _Actively developed — schematics and PCB in progress, firmware not yet started._
 
 ---
 
-Volvemos a realizar las operaciones iniciales pero con los valores nuevos; quedando de la siguiente manera:
+[🇪🇸 Versión en español](README-es.md)
 
-$$V_{out} = (130mV)(10) = 1.3V$$
+</div>
 
-Deben existir $130mV$ en la resistencia de $10k \Omega$.
+## ✨ Features
+
+- **4 voltage channels** — 0–50 V range with ~4 MΩ input impedance
+- **Current sensing** — ACS712-5A hall-effect sensor (up to 5 A)
+- **MCP6002 op-amp** — adjustable gain (×10) with 1.5 V offset
+- **Overvoltage protection** — 1N4148 clamping diodes
+- **ESP32** — dual-core microcontroller with built-in ADC
+- **LCD 16×02 display** — alpha-numeric user interface
+- **Rechargeable battery** — 18650 Li‑ion + TP4056 charger
+- **SD card logging** — onboard data storage
+- **Piezo buzzer** — audible alerts
+- **3D-printable enclosure** — custom case design
+- **KiCad 9.0 PCB** — hierarchical schematic (4 sheets), PCB layout in progress
+
+## 📐 Electronic Design
+
+The hardware is designed with **KiCad 9.0** and organised as a hierarchical project:
+
+| Sheet | Status |
+|---|---|
+| **Voltage measurement** | ✅ Detailed — divider network, MCP6002 gain stage, offset & clamping |
+| **Microcontroller (ESP32)** | 🟡 Placeholder |
+| **Charger (TP4056)** | 🟡 Placeholder |
+| **PCB layout** | 🟡 In progress |
+
+> 📖 Full analysis (in Spanish): [Electronic Design](https://www.alejandro-leyva.com/mavi/electronic_design/)
+
+### Voltage Measurement Chain
+
+```
+  V_in (0–50 V)
+      │
+      ├─ 4 × 1 MΩ (high-impedance divider)
+      ├─ 1N4148 clamping diodes
+      ├─ 10 kΩ sense resistor → 130 mV @ 50 V
+      └─ MCP6002 (gain ×10) → 1.3 V to ESP32 ADC
+```
+
+- **Input impedance:** ~4 MΩ  
+- **Max measurable voltage:** 50 V  
+- **ADC input range:** 0–1.3 V (within ESP32's 0–3.3 V)  
+- **Adjustable offset:** 1.5 V via voltage divider + buffer
+
+### Current Measurement
+
+The **ACS712-5A** hall-effect sensor provides galvanically isolated current measurement up to **5 A** with a sensitivity of **185 mV/A**.
+
+### Power System
+
+- **Battery:** 18650 Li‑ion cell  
+- **Charger:** TP4056 module (5 V USB input)  
+- **Regulation:** Boost converter to 5 V for the circuit
+
+## 🖥️ Firmware
+
+> 🚧 **Not started** — the firmware directory contains placeholders only.
+
+Design artefacts exist for:
+- **UI screens** — Excalidraw mockups of the LCD interface flow  
+- **Communication protocol** — block diagram of planned serial/I²C communication  
+- **Data logging** — SD card storage planned
+
+## 📂 Repository Structure
+
+```
+📦 mavi/
+├── 📁 .github/workflows/     # CI/CD — auto-deploy docs to GitHub Pages
+├── 📁 docs/                  # MkDocs documentation site
+│   ├── 📄 index.md           # Landing page
+│   ├── 📄 electronic_design.md  # Voltage measurement analysis (Spanish)
+│   ├── 📄 case.md            # Enclosure & UI design
+│   ├── 📄 firmware.md        # Placeholder
+│   ├── 📁 assets/            # Images & resources
+│   ├── 📁 datasheets/        # Component datasheets
+│   └── 📁 firmware/          # UI & communication diagrams
+├── 📁 schematic/             # KiCad hardware design files
+│   ├── 📄 mavi.kicad_pro     # KiCad project
+│   ├── 📄 mavi.kicad_sch     # Top-level schematic (hierarchical)
+│   ├── 📄 mavi.kicad_pcb     # PCB layout
+│   ├── 📄 voltage.kicad_sch  # Voltage measurement sheet (complete)
+│   ├── 📄 micro.kicad_sch    # Microcontroller sheet (placeholder)
+│   └── 📄 cargador.kicad_sch # Charger sheet (placeholder)
+├── 📁 firmware/              # Future firmware source
+│   └── 📄 index.md           # Placeholder
+├── 📄 mkdocs.yml             # Documentation site config
+├── 📄 pyproject.toml         # Python project (Poetry)
+├── 📄 README.md              # This file
+├── 📄 README-es.md           # Spanish version
+├── 📄 LICENSE.md             # GPLv3 (software)
+└── 📄 HARDWARE_LICENSE.md    # CERN-OHL-S-2.0 (hardware)
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+| Tool | Version |
+|---|---|
+| [KiCad](https://www.kicad.org/) | 9.0 or later |
+| [Python](https://www.python.org/) | 3.11+ |
+| [Poetry](https://python-poetry.org/) | 2.4+ |
+
+### Build the Documentation Locally
+
+```bash
+poetry install
+poetry run mkdocs serve
+```
+
+Then open `http://localhost:8000` in your browser.
+
+### Open the Hardware Design
+
+```bash
+kicad schematic/mavi.kicad_pro
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Since the project is in early development, feel free to:
+
+- Open issues for bugs or feature suggestions
+- Submit pull requests with hardware improvements or firmware stubs
+- Help design the enclosure (3D printing)
+- Review the electronic design
+
+## 📄 License
+
+| Component | License |
+|---|---|
+| **Software & Firmware** | [GNU General Public License v3.0](LICENSE.md) |
+| **Hardware (schematics, PCB, enclosure)** | [CERN Open Hardware Licence Strongly Reciprocal v2.0](HARDWARE_LICENSE.md) |
+
+## 👤 Author
+
+**Alejandro Leyva (Xizuth)**  
+
+- GitHub: [@jalmx](https://github.com/jalmx)  
+- Web: [alejandro-leyva.com](https://www.alejandro-leyva.com)  
 
 ---
-Agregando un potenciómetro de $5k \Omega$ a la maya de la entrada:
 
-$$Rt = (1M\Omega * 4) + 15k \Omega = 4.015 M \Omega$$
-
-$$I = \frac{V}{R} = \frac{50V}{4.01M\Omega} = 12.454 \mu A$$
-
-La resistencia que debería quedar ajustar para obtener los $130mV$
-
-$$R_{ajustada} = \frac{V}{I} =\frac{130mV}{12.454 \mu A} = 10.43k \Omega$$
-
----
-
-Para generar el offset hago un divisor de tension y un buffer, con esto es para ajustar el voltaje a $1.5V$
-
-![divisor](electronic_design/divisor.png)
-
----
-
-Los diodos que se colocan encontrados es para hacer un clamping, puesto que el voltaje sera de 130mV a la entrada y el diodo corta aproximadamente a 500mV o 600mV. Coloque 1N4148 por ser de alta velocidad.
-
-![diodos](electronic_design/diodos.png)
-
-### Current Módulo ACS712-5A
-
-pendiente...
-
-### Source
-
-Se colocara una batería de 18650 con su cargador a 5V, colocando una fuente boots para alimentar el circuito a 5V.
-
-[link](https://www.electrothinks.com/2024/02/tp4056-lithium-cell-charger-module.html)
-
-![sche](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjBw5O2JQbIFlqgata96NCzxRLCURfoVufbwm4XPaidMepfK-8uWYK4UVsXnP19AHFbK6bD4d6lgTxYcpMuweu7UrO3VUDAIb-eXzmrjifYgeozlCzAL5DzGnpDVFS4zmHQstG-TLtBFPua8CIqROcsPEVUvey74yuz36DZPE-2PJvJhh1sFm5CBoXZEJS8/s640-rw/schematic-of-tp4056-lithium-cell-charger-module-circuit.png)
-
-## Log
-
-Se guardaran los datos en una tarjeta SD
+<div align="center">
+  <sub>Built with ❤️ using KiCad, MkDocs, and ESP32</sub>
+</div>

@@ -10,13 +10,13 @@ Instrument to measure Voltage and Current
 
 ## Screens
 
-![front](design/front.png)
+![front](interface/front.png)
 
-![screen](design/screens.png)
+![screen](interface/screens.png)
 
 ## Case
 
-![side](design/sides.png)
+![side](interface/sides.png)
 
 ## Electronic Design
 
@@ -24,7 +24,7 @@ Instrument to measure Voltage and Current
 
 Este diseño es para todas las entradas de voltaje
 
-![schematic](schematic/schematic_v1.png)
+![schematic](electronic_design/schematic_v1.png)
 
 Como voltaje máximo se quiere que sean 50V.
 El amplificador que colocaremos tendrá ganancia de 10.
@@ -36,7 +36,7 @@ Haciendo el calculo de la corriente que pasara con base a las resistencias inici
 
 $$Rt = (1M\Omega * 4) + 10k \Omega = 4.01 M \Omega$$
 
-![schematic](schematic/resistencias_entrada.png)
+![schematic](electronic_design/resistencias_entrada.png)
 
 Ya con la resistencia total, podemos conocer la corriente que pasa en esa maya:
 
@@ -48,7 +48,7 @@ Con esto vamos a conocer el voltaje que pasar en la resistencia de $10k \Omega$.
 
 $$V=RI = (10 k \Omega )(12.46 \mu A) = 124.6mV$$
 
-![amp](schematic/amplificador_10.png)
+![amp](electronic_design/amplificador_10.png)
 
 Por lo tanto, en la resistencia R5 de $10k \Omega$ deben pasar $124.6mV$; pero necesitamos conocer si sera suficiente este voltaje de salida del amplificador, para el voltaje que llegara al ADC del ESP32.
 
@@ -62,7 +62,7 @@ $$V_{out} = (124.6mV)(10) = 1.246V$$
 Pero, necesitamos $1.3V$ a la salida; por ende esto se ajusta fácilmente con un potenciómetro en seria a la resistencia de $10k \Omega$.
 Estos $1.3V$ se necesitan por la salida que deseamos:
 
-![signal](assets/signal.png).
+![signal](electronic_design/signal.png).
 
 ---
 
@@ -87,13 +87,13 @@ $$R_{ajustada} = \frac{V}{I} =\frac{130mV}{12.454 \mu A} = 10.43k \Omega$$
 
 Para generar el offset hago un divisor de tension y un buffer, con esto es para ajustar el voltaje a $1.5V$
 
-![divisor](schematic/divisor.png)
+![divisor](electronic_design/divisor.png)
 
 ---
 
 Los diodos que se colocan encontrados es para hacer un clamping, puesto que el voltaje sera de 130mV a la entrada y el diodo corta aproximadamente a 500mV o 600mV. Coloque 1N4148 por ser de alta velocidad.
 
-![diodos](schematic/diodos.png)
+![diodos](electronic_design/diodos.png)
 
 ### Current Módulo ACS712-5A
 
